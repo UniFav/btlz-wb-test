@@ -17,11 +17,15 @@ export async function startCron() {
 
     const spreadsheetIds = env.GOOGLE_SHEETS_IDS;
 
-    cron.schedule("0 * * * *", async () => {
+    // cron.schedule("0 * * * *", async () => {
         logger.info("Running hourly job: WB Tariff Sync and Google Sheets update");
 
         try {
-            await wbTariffSync.sync();
+            const err = await wbTariffSync.sync();
+            if (err){
+                logger.error({ err }, "❌ Error occurred during WB tariffs sync");
+                return
+            }
             logger.info("✔️ Tariffs fetched and saved to DB");
 
             for (const spreadsheetId of spreadsheetIds) {
@@ -35,7 +39,7 @@ export async function startCron() {
         } catch (error) {
             logger.error("❌ Cron job error:", error);
         }
-    });
+    // });
 
     logger.info("✅ Cron job scheduled to run every hour");
 }

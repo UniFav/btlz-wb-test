@@ -69,13 +69,13 @@ export class WBTariffsSync {
    * then inserts or updates them in the local database.
    * Handles errors and logs progress.
    */
-  public async sync(): Promise<void> {
+  public async sync(): Promise<any> {
     const today = new Date().toISOString().split("T")[0];
     logger.info(`🚚 Starting WB tariffs sync for ${today}`);
 
     try {
       const response = await this.axiosInstance.get(`/tariffs/box?date=${today}`);
-
+      
       const warehouseList = response?.data?.response?.data?.warehouseList;
       if (!Array.isArray(warehouseList)) {
         logger.warn("⚠️ Invalid data format from WB API");
@@ -103,7 +103,7 @@ export class WBTariffsSync {
 
       logger.info("✅ WB tariffs sync completed");
     } catch (err: any) {
-      logger.error({ err }, "❌ Error occurred during WB tariffs sync");
+      return err;
     }
   }
 }
